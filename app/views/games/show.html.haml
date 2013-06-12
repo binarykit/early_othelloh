@@ -1,0 +1,52 @@
+.othelloh
+
+- if @game_before_auto_play_tiles.any?
+  .prev.board
+    - @game_before_auto_play_tiles.each do |frozen_tile|
+      - cls = frozen_tile[:value].nil? ? '' : (frozen_tile[:value] ? 'white' : 'black')
+      .tile{ :row=> frozen_tile[:row], :col=> frozen_tile[:col], :class => cls }
+
+.current.board
+  - @game.tiles.each do |tile|
+    - cls = tile.is_black? ? 'black' : (tile.is_white? ? 'white' : '')
+    - if cls == ''
+      - ct = tile.is_available? @moves
+      - if ct > 0
+        = link_to play_game_path(@game, tile) do
+          .tile.available{ :row=> tile.row, :col=> tile.col }
+            / %span.count= ct
+      - else
+        .tile{ :row=> tile.row, :col=> tile.col }
+    - elsif @game.undos_allowed? && @game.plays.last.tile == tile
+      = link_to(undo_play_path(@game), :class => 'undo') do
+        .tile{ :row=> tile.row, :col=> tile.col, :class => cls }
+          %span undo
+    - else
+      .tile{ :row=> tile.row, :col=> tile.col, :class => cls }
+
+.info
+  .scores
+    - if @outcome.nil?
+      - cls = @game.turn == false ? 'turn' : ''
+      .black.score_board{:class => cls}
+        - cls = @game.black_count < 10 ? 'single' : 'double'
+        %span.count{:class => cls}= @game.black_count
+        
+      - cls = @game.turn ? 'turn' : ''
+      .white.score_board{:class => cls}
+        - cls = @game.white_count < 10 ? 'single' : 'double'
+        %span.count{:class => cls}= @game.white_count
+    - else
+      .winner{:class => @outcome}
+      
+      .black.score_board
+        - cls = @game.black_count < 10 ? 'single' : 'double'
+        %span.count{:class => cls}= @game.black_count
+      .white.score_board
+        - cls = @game.white_count < 10 ? 'single' : 'double'
+        %span.count{:class => cls}= @game.white_count
+.new
+  = link_to new_auto_game_path(@game) do
+    .one.player 1
+  = link_to new_game_path(@game) do
+    .two.player 2

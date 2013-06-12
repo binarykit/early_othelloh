@@ -1,0 +1,9 @@
+.games
+  - @games.each do |game|
+    .outcome= game.outcome_display
+    .lnk= game.playable? ? link_to('play', game) : link_to('view', game)
+    .lnk= link_to 'delete', game, :method => :delete, :data => { :confirm => 'you sure?' }
+
+%br
+
+= link_to 'new game?', new_game_path
